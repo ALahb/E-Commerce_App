@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  app:
+    links:
+      - mysqldb
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: node-mysql-app
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - 3636:3636
+    volumes: 
+      - .:/app
+      - '/app/node_modules'
+  mysqldb:
+    image: mysql:latest
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_DATABASE=mega_shop
+      - MYSQL_USER="root"
+      - MYSQL_PASSWORD=""
+      - MYSQL_ROOT_PASSWORD=""
