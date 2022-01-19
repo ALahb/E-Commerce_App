@@ -1,89 +1,35 @@
-#!/usr/bin/env node
+const express = require("express");
+const cors = require("cors");
 
-/**
- * Module dependencies.
- */
- const app = require('./app');
- const debug = require('debug')('mega-back:server');
- const http = require('http');
- 
- /**
-  * Get port from environment and store in Express.
-  */
- const port = normalizePort(process.env.PORT || '3000');
- app.set('port', port);
- 
- /**
-  * Create HTTP server.
-  */
- const server = http.createServer(app);
- 
- /**
-  * Listen on provided port, on all network interfaces.
-  */
- 
- server.listen(port);
- server.on('error', onError);
- server.on('listening', onListening);
- 
- /**
-  * Normalize a port into a number, string, or false.
-  */
- 
- function normalizePort(val) {
-   const port = parseInt(val, 10);
- 
-   if (isNaN(port)) {
-     // named pipe
-     return val;
-   }
- 
-   if (port >= 0) {
-     // port number
-     return port;
-   }
- 
-   return false;
- }
- 
- /**
-  * Event listener for HTTP server "error" event.
-  */
- 
- function onError(error) {
-   if (error.syscall !== 'listen') {
-     throw error;
-   }
- 
-   const bind = typeof port === 'string'
-       ? 'Pipe ' + port
-       : 'Port ' + port;
- 
-   // handle specific listen errors with friendly messages
-   switch (error.code) {
-     case 'EACCES':
-       console.error(bind + ' requires elevated privileges');
-       process.exit(1);
-       break;
-     case 'EADDRINUSE':
-       console.error(bind + ' is already in use');
-       process.exit(1);
-       break;
-     default:
-       throw error;
-   }
- }
- 
- /**
-  * Event listener for HTTP server "listening" event.
-  */
- 
- function onListening() {
-   const addr = server.address();
-   const bind = typeof addr === 'string'
-       ? 'pipe ' + addr
-       : 'port ' + addr.port;
-   debug('Listening on ' + bind);
-   console.log('Listening on ' + bind);
- }
- 
+const app = express();
+
+var corsOptions = {
+  origin: "http://localhost:3000"
+};
+
+/* CORS */
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'PUT', 'DELETE', 'PATCH', 'POST'],
+  allowedHeaders: 'Content-Type, Authorization, Origin, X-Requested-With, Accept'
+}));
+
+// parse requests of content-type - application/json
+app.use(express.json());
+
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+
+
+// simple route
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to Dashboard application." });
+});
+
+require("./src/routes/product.route")(app);
+
+// set port, listen for requests
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
